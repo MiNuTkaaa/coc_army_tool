@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CoC Top Armies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Barlow:wght@400;600&display=swap">
+  <style>
+    /* Layout: one centered column of stacked tables; wide tables scroll inside their own box. */
+    :root {
+      --bg: #f4f5f7; --surface: #ffffff; --soft: #eaecf0; --fg: #1a1e26; --muted: #576071;
+      --line: #d8dbe2; --accent: #a4561a; --link: #1d5ca6; --danger: #b42318; --danger-bg: #fdecea;
+      --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+      --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #12151b; --surface: #181c24; --soft: #1e232d; --fg: #e6e8ed; --muted: #a0a7b6;
+        --line: #2b3140; --accent: #e09a52; --link: #8ab8ff; --danger: #f97066; --danger-bg: #3a1714;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #12151b; --surface: #181c24; --soft: #1e232d; --fg: #e6e8ed; --muted: #a0a7b6;
+      --line: #2b3140; --accent: #e09a52; --link: #8ab8ff; --danger: #f97066; --danger-bg: #3a1714;
+      color-scheme: dark;
+    }
+    body { background: var(--bg); color: var(--fg); font: 15px/1.45 var(--font-body); max-width: 1100px; margin: 0 auto; padding-block: 24px 40px; padding-inline: 16px; }
+    h1, h2 { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.01em; text-wrap: balance; }
+    h1 { font-size: 2rem; line-height: 1.1; margin: 0 0 14px; }
+    h1 span { color: var(--accent); }
+    h2 { font-size: 1.35rem; margin: 30px 0 2px; }
+    a { color: var(--link); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-bottom: 12px; }
+    .bar label { display: flex; gap: 6px; align-items: center; font-weight: 600; }
+    select { font: inherit; font-weight: 400; padding: 4px 8px; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+    .meta, .note { color: var(--muted); font-size: 0.9rem; }
+    .note { margin: 4px 0 10px; max-width: 75ch; }
+    #error { display: none; padding: 10px 12px; margin-bottom: 12px; border: 1px solid var(--danger); border-radius: 4px; background: var(--danger-bg); color: var(--fg); }
+    .wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: top; }
+    tbody > tr:last-child > td { border-bottom: 0; }
+    th { font-family: var(--font-display); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.army { white-space: normal; min-width: 280px; }
+    .tag { color: var(--muted); font-family: var(--font-mono); font-size: 0.8rem; }
+    .label { font-family: var(--font-display); color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 6px; }
+    .line + .line { margin-top: 2px; }
+    button.toggle { font: inherit; font-size: 0.9rem; padding: 3px 10px; cursor: pointer; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+    button.toggle:hover { border-color: var(--muted); }
+    button.toggle[aria-expanded="true"] { font-weight: 600; border-color: var(--accent); color: var(--accent); }
+    button.link { font: inherit; color: var(--link); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+    td.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    table.players { width: auto; }
+    button.more { margin-top: 8px; }
+    td.type, div.type { font-weight: 600; }
+    td.strategy { white-space: normal; min-width: 240px; }
+    td.strategy .meta + .meta { margin-top: 2px; }
+    button.player { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+    button.player::before { content: '▸'; display: inline-block; width: 1.1em; color: var(--muted); }
+    button.player[aria-expanded="true"]::before { content: '▾'; color: var(--accent); }
+    button.player:disabled { cursor: default; }
+    button.player:disabled::before { content: ''; }
+    tr.detail > td { background: var(--soft); padding: 6px 10px 12px 24px; }
+    tr.detail table th, tr.detail table td { border-bottom-color: transparent; padding: 5px 10px 5px 0; }
+    footer { margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <h1>Clash of Clans <span>top armies</span></h1>
+  <p class="meta">Snapshot taken 2026-10-14 21:52 UTC. The numbers change only when a new snapshot is published.</p>
+  <div class="bar">
+    <label>Players <select id="source">
+      <option value="top200">Live global top 200</option>
+      <option value="current1000">Current top 1,000</option>
+      <option value="legend1000">Legend I top 1,000 (last season)</option>
+    </select></label>
+    <label>Town Hall <select id="th"></select></label>
+    <span class="meta" id="count"></span>
+    <span class="meta" id="updated"></span>
+  </div>
+  <div id="error" role="alert"></div>
+
+  <h2>Top armies by type</h2>
+  <p class="note" id="armiesNote"></p>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr><th>Army type</th><th class="num">Attacks</th><th class="num">Players</th><th class="num">Avg stars</th><th class="num">3-star rate</th><th class="num">Avg destruction</th><th></th></tr>
+      </thead>
+      <tbody id="armies"></tbody>
+    </table>
+  </div>
+
+  <h2>Players</h2>
+  <p class="note">Select a player to see their recent attacks.</p>
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr><th class="num">Rank</th><th>Player</th><th class="num">TH</th><th class="num">Trophies</th><th>League</th><th>Clan</th><th class="num">Level</th><th class="num">Attacks</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="note">Sources: the live global top 200; the current top 1,000, built by merging every country's live top 200 and ranking by trophies;
+    or the top 1,000 of the last finished Legend League season, ranked as that season ended. The two larger lists refresh hourly.
+    Per-TH leaderboards are not in the API, so lower Town Halls may be empty.
+    Armies come from ranked attacks in each player's battle log. An army's type is the troop filling the most housing space
+    (Dragons and Dragon Riders count together; Healers never count), or Fireball when the Grand Warden carries it without a core troop such as Throwers.
+    Balloons with a Lava or Ice Hound are LaLo. The 10 most used types are listed; the rest are under Other.
+    Strategies within a type are patterns in what the armies carry (hero equipment, pets, spells, troops), since the API does not show how an attack was played.
+    "Typical" lists what at least three quarters of a strategy's armies have and at most half of the type's other armies do.
+    A variation is one set of main troops (5% of the army or more) with one set of heroes, equipment and pets; spells and small filler troops may differ.</p>
+
+  <footer class="note">Data from the official Clash of Clans API. This is a fan-made tool, not affiliated with, endorsed, sponsored, or approved by Supercell.</footer>
+
+  <script>
+    (() => {
+      const COPY_LINK = 'https://link.clashofclans.com/en?action=CopyArmy&army=';
+      const realFetch = window.fetch.bind(window);
+      const files = {};
+      const load = file => files[file] ??= realFetch(file).then(res => {
+        if (!res.ok) throw Object.assign(new Error('Missing snapshot file ' + file), { status: 404 });
+        return res.json();
+      });
+      const reply = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+
+      async function route(url) {
+        const source = url.searchParams.get('source') || 'top200';
+        const attacks = url.pathname.match(/^\/api\/players\/([^/]+)\/attacks$/);
+        if (attacks) {
+          const tag = decodeURIComponent(attacks[1]);
+          const list = (await load('data/' + source + '-attacks.json'))[tag] || [];
+          return { tag, attacks: list.map(([battleType, opponentTownHallLevel, stars, destructionPercentage, battleTimestamp, armyShareCode]) => ({
+            battleType, opponentTownHallLevel, stars, destructionPercentage, battleTimestamp, armyShareCode,
+            copyLink: COPY_LINK + armyShareCode, army: window.CocArmy.decodeArmy(armyShareCode),
+          })) };
+        }
+        const th = url.searchParams.get('th') || 'all';
+        const top = await load('data/' + source + '-top.json');
+        if (url.pathname === '/api/top') {
+          return { ...top, th, players: top.players.filter(p => th === 'all' || p.townHallLevel === Number(th)) };
+        }
+        if (url.pathname === '/api/armies') {
+          if (th !== 'all' && !top.levels.includes(Number(th))) {
+            return { updatedAt: top.updatedAt, label: top.label, th, attackCount: 0, attackCounts: {}, armyTypes: [] };
+          }
+          const file = top.levels.length === 1 ? 'all' : th;
+          return load('data/' + source + '-armies-' + file + '.json');
+        }
+        throw Object.assign(new Error('Not part of the snapshot'), { status: 404 });
+      }
+
+      window.fetch = async (input, init) => {
+        const url = new URL(String(input), location.href);
+        if (!url.pathname.startsWith('/api/')) return realFetch(input, init);
+        try {
+          return reply(200, await route(url));
+        } catch (e) {
+          return reply(e.status || 500, { error: 'snapshot', message: e.message });
+        }
+      };
+    })();
+  </script>
+  <script src="army.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const select = $('th');
+    select.add(new Option('All', 'all'));
+    for (let th = 18; th >= 7; th--) select.add(new Option('TH' + th, th));
+
+    const BATTLE_TYPES = { legend: 'Legend', ranked: 'Ranked', homeVillage: 'Multiplayer' };
+    const VARIATIONS_SHOWN = 10;
+    const sourceSelect = $('source');
+    let loadId = 0;
+
+    function el(tag, props, ...children) {
+      const node = Object.assign(document.createElement(tag), props);
+      node.append(...children);
+      return node;
+    }
+    const cell = (text, className = '') => el('td', { className }, String(text ?? '—'));
+    const listText = items => items.map(i => `${i.count}× ${i.name}`).join(', ');
+    const line = (label, text) => el('div', { className: 'line' }, el('span', { className: 'label' }, label), text);
+    const copyLink = href => el('a', { href, target: '_blank', rel: 'noopener' }, 'Copy army');
+
+    function armyLines(army) {
+      const lines = [];
+      if (army.units.length) lines.push(line('Troops', listText(army.units)));
+      if (army.spells.length) lines.push(line('Spells', listText(army.spells)));
+      const cc = [...army.clanCastleUnits, ...army.clanCastleSpells];
+      if (cc.length) lines.push(line('Clan Castle', listText(cc)));
+      if (army.heroes.length) lines.push(line('Heroes', army.heroes.map(h =>
+        h.name + (h.equipment.length ? ` (${h.equipment.join(', ')})` : '') + (h.pet ? ` + ${h.pet}` : '')).join('; ')));
+      return lines;
+    }
+
+    // Battle timestamps look like 20261009T121737.000Z.
+    function formatTime(ts) {
+      const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/.exec(ts || '');
+      if (!m) return '—';
+      return new Date(Date.UTC(m[1], m[2] - 1, m[3], m[4], m[5], m[6])).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function showError(text) {
+      $('error').textContent = text;
+      $('error').style.display = text ? 'block' : 'none';
+    }
+
+    async function getJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(`${res.status} ${data.error}: ${data.message}`);
+      return data;
+    }
+
+    function attackTable(attacks) {
+      if (!attacks.length) return el('p', { className: 'meta' }, 'No attacks with an army in this player\'s battle log.');
+      const head = el('tr', {}, ...['When', 'Type', 'vs TH', 'Stars', 'Destruction', 'Army', ''].map(h => el('th', {}, h)));
+      const rows = attacks.map(a => el('tr', {},
+        cell(formatTime(a.battleTimestamp)),
+        cell(BATTLE_TYPES[a.battleType] || a.battleType),
+        cell(a.opponentTownHallLevel, 'num'),
+        cell(a.stars, 'num'),
+        cell(a.destructionPercentage + '%', 'num'),
+        el('td', { className: 'army' }, ...armyLines(a.army)),
+        el('td', {}, copyLink(a.copyLink))));
+      return el('table', {}, el('thead', {}, head), el('tbody', {}, ...rows));
+    }
+
+    // Shows the content in a detail row under the given row; pressing the same button again hides it.
+    function toggleRow(button, row, content) {
+      const wasOpen = button.getAttribute('aria-expanded') === 'true';
+      if (row.nextSibling?.classList.contains('detail')) row.nextSibling.remove();
+      for (const b of row.querySelectorAll('button[aria-expanded]')) b.setAttribute('aria-expanded', 'false');
+      if (wasOpen) return;
+      button.setAttribute('aria-expanded', 'true');
+      row.after(el('tr', { className: 'detail' }, el('td', { colSpan: row.children.length }, content())));
+    }
+
+    function toggleButton(label, row, content) {
+      const button = el('button', { className: 'toggle', type: 'button' }, label);
+      button.setAttribute('aria-expanded', 'false');
+      button.addEventListener('click', () => toggleRow(button, row(), content));
+      return button;
+    }
+
+    const statCells = s => [cell(s.uses, 'num'), cell(s.players.length, 'num'), cell(s.avgStars.toFixed(2), 'num'),
+      cell((s.threeStarRate * 100).toFixed(0) + '%', 'num'), cell(s.avgDestruction.toFixed(1) + '%', 'num')];
+
+    // Opens the player's attacks in the Players table and scrolls there.
+    function goToPlayer(tag) {
+      const row = [...$('rows').children].find(r => r.dataset.tag === tag);
+      if (!row) return;
+      const button = row.querySelector('button');
+      if (button.getAttribute('aria-expanded') !== 'true') button.click();
+      row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function playersTable(players) {
+      const head = el('tr', {}, el('th', { className: 'num' }, 'Rank'), el('th', {}, 'Player'),
+        ...['Attacks', 'Avg stars', '3-star rate', 'Avg destruction'].map(h => el('th', { className: 'num' }, h)));
+      const rows = players.map(p => {
+        const link = el('button', { className: 'link', type: 'button', title: 'Show this player\'s attacks' }, p.name);
+        link.addEventListener('click', () => goToPlayer(p.tag));
+        return el('tr', {}, cell(p.rank, 'num'), el('td', {}, link, ' ', el('span', { className: 'tag' }, p.tag)), cell(p.uses, 'num'),
+          cell(p.avgStars.toFixed(2), 'num'), cell((p.threeStarRate * 100).toFixed(0) + '%', 'num'), cell(p.avgDestruction.toFixed(1) + '%', 'num'));
+      });
+      return el('table', { className: 'players' }, el('thead', {}, head), el('tbody', {}, ...rows));
+    }
+
+    function strategyTable(type) {
+      const head = el('tr', {}, el('th', {}, type.name === 'Other' ? 'Army type' : 'Strategy'),
+        ...['Attacks', 'Players', 'Avg stars', '3-star rate', 'Avg destruction'].map(h => el('th', { className: 'num' }, h)), el('th', {}));
+      const rows = type.strategies.map(s => {
+        const name = el('td', { className: 'strategy' }, el('div', { className: 'type' }, s.name));
+        if (s.note) name.append(el('div', { className: 'meta' }, s.note));
+        if (s.typical.length) name.append(el('div', { className: 'meta' }, el('span', { className: 'label' }, 'Typical'), s.typical.join(', ')));
+        const row = el('tr', {}, name, ...statCells(s), el('td', { className: 'actions' },
+          toggleButton('Variations (' + s.variations.length + ')', () => row, () => variationTable(s)),
+          toggleButton('Players', () => row, () => playersTable(s.players))));
+        return row;
+      });
+      return el('table', {}, el('thead', {}, head), el('tbody', {}, ...rows));
+    }
+
+    function variationTable(strategy) {
+      const head = el('tr', {}, el('th', {}, 'Most used version'),
+        ...['Attacks', 'Players', 'Avg stars', '3-star rate', 'Avg destruction'].map(h => el('th', { className: 'num' }, h)), el('th', {}));
+      const rows = strategy.variations.map(v => {
+        const row = el('tr', {}, el('td', { className: 'army' }, ...armyLines(v.army)), ...statCells(v),
+          el('td', { className: 'actions' }, copyLink(v.copyLink), toggleButton('Players', () => row, () => playersTable(v.players))));
+        return row;
+      });
+      const table = el('table', {}, el('thead', {}, head), el('tbody', {}, ...rows));
+      if (rows.length <= VARIATIONS_SHOWN) return table;
+      rows.slice(VARIATIONS_SHOWN).forEach(row => { row.hidden = true; });
+      const more = el('button', { className: 'toggle more', type: 'button' }, `Show all ${rows.length} variations`);
+      more.addEventListener('click', () => {
+        rows.forEach(row => { row.hidden = false; });
+        more.remove();
+      });
+      return el('div', {}, table, more);
+    }
+
+    // Loads a player's attacks when their row is first opened.
+    function playerAttacks(tag) {
+      const box = el('div', {}, el('p', { className: 'meta' }, 'Loading attacks…'));
+      getJson(`/api/players/${encodeURIComponent(tag)}/attacks?source=${sourceSelect.value}`)
+        .then(data => box.replaceChildren(attackTable(data.attacks)))
+        .catch(e => box.replaceChildren(el('p', { className: 'meta' }, 'Could not load attacks — ' + e.message)));
+      return box;
+    }
+
+    function renderPlayers(players) {
+      $('rows').replaceChildren(...players.map(p => {
+        const button = el('button', { className: 'player', type: 'button', disabled: true }, p.name + ' ', el('span', { className: 'tag' }, p.tag));
+        button.setAttribute('aria-expanded', 'false');
+        const row = el('tr', {}, cell(p.rank, 'num'), el('td', {}, button), cell(p.townHallLevel, 'num'), cell(p.trophies, 'num'),
+          cell(p.leagueTier), cell(p.clan), cell(p.expLevel, 'num'), cell('…', 'num attacks'));
+        row.dataset.tag = p.tag;
+        button.addEventListener('click', () => toggleRow(button, row, () => playerAttacks(p.tag)));
+        return row;
+      }));
+    }
+
+    function renderArmies(data) {
+      for (const row of $('rows').children) {
+        row.querySelector('.attacks').textContent = data.attackCounts[row.dataset.tag] ?? 0;
+        row.querySelector('button').disabled = false;
+      }
+      $('armies').replaceChildren(...data.armyTypes.map(type => {
+        const row = el('tr', {}, cell(type.name, 'type'), ...statCells(type), el('td', { className: 'actions' },
+          toggleButton((type.name === 'Other' ? 'Types (' : 'Strategies (') + type.strategies.length + ')', () => row, () => strategyTable(type)),
+          toggleButton('Players', () => row, () => playersTable(type.players))));
+        return row;
+      }));
+      $('armiesNote').textContent = data.attackCount
+        ? `${data.attackCount} ranked attacks from ${Object.keys(data.attackCounts).length} players, most used type first.`
+        : 'No ranked attacks found for this Town Hall.';
+    }
+
+    async function load() {
+      const id = ++loadId;
+      const th = select.value;
+      const query = `?source=${sourceSelect.value}&th=${th}`;
+      showError('');
+      $('count').textContent = 'Loading…';
+      $('updated').textContent = '';
+      $('rows').replaceChildren();
+      $('armies').replaceChildren();
+      $('armiesNote').textContent = '';
+      try {
+        const top = await getJson('/api/top' + query);
+        if (id !== loadId) return;
+        renderPlayers(top.players);
+        $('count').textContent = top.players.length + (top.players.length === 1 ? ' player' : ' players');
+        $('updated').textContent = 'Updated at ' + new Date(top.updatedAt).toLocaleString();
+        $('armiesNote').textContent = 'Loading armies…';
+        const armies = await getJson('/api/armies' + query);
+        if (id === loadId) renderArmies(armies);
+      } catch (e) {
+        if (id !== loadId) return;
+        if ($('count').textContent === 'Loading…') $('count').textContent = '';
+        $('armiesNote').textContent = '';
+        showError('Could not load data — ' + e.message);
+      }
+    }
+
+    select.addEventListener('change', load);
+    sourceSelect.addEventListener('change', load);
+    load();
+  </script>
+</body>
+</html>
